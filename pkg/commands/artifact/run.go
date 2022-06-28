@@ -176,7 +176,7 @@ func (r *runner) ScanImage(ctx context.Context, opt Option) (types.Report, error
 
 func (r *runner) ScanFilesystem(ctx context.Context, opt Option) (types.Report, error) {
 	// Disable the individual package scanning
-	opt.DisabledAnalyzers = append(opt.DisabledAnalyzers, analyzer.TypeIndividualPkgs...)
+	// opt.DisabledAnalyzers = append(opt.DisabledAnalyzers, analyzer.TypeIndividualPkgs...)
 
 	return r.scanFS(ctx, opt)
 }
@@ -400,7 +400,7 @@ func disabledAnalyzers(opt Option) []analyzer.Type {
 	// Specified analyzers to be disabled depending on scanning modes
 	// e.g. The 'image' subcommand should disable the lock file scanning.
 	analyzers := opt.DisabledAnalyzers
-
+	// analyzers := make([]analyzer.Type, 0, 10)
 	// It doesn't analyze apk commands by default.
 	if !opt.ScanRemovedPkgs {
 		analyzers = append(analyzers, analyzer.TypeApkCommand)
