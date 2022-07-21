@@ -120,6 +120,7 @@ func (a Artifact) Inspect(ctx context.Context) (types.ArtifactReference, error) 
 		Applications:    result.Applications,
 		Secrets:         result.Secrets,
 		CustomResources: result.CustomResources,
+		CPEs:            result.CPE,
 	}
 
 	if err = a.handlerManager.PostHandle(ctx, result, &blobInfo); err != nil {

@@ -12,6 +12,7 @@ import (
 	dbTypes "github.com/aquasecurity/trivy-db/pkg/types"
 	"github.com/aquasecurity/trivy-db/pkg/vulnsrc/vulnerability"
 	"github.com/aquasecurity/trivy/pkg/detector/library/compare"
+	"github.com/aquasecurity/trivy/pkg/detector/library/compare/cpe"
 	"github.com/aquasecurity/trivy/pkg/detector/library/compare/npm"
 	"github.com/aquasecurity/trivy/pkg/detector/library/compare/pep440"
 	"github.com/aquasecurity/trivy/pkg/detector/library/compare/rubygems"
@@ -49,6 +50,9 @@ func NewDriver(libType string) (Driver, error) {
 	case ftypes.Pipenv, ftypes.Poetry, ftypes.Pip, ftypes.PythonPkg:
 		ecosystem = vulnerability.Pip
 		comparer = pep440.Comparer{}
+	case ftypes.CPE:
+		ecosystem = vulnerability.CPE
+		comparer = cpe.Comparer{}
 	default:
 		return Driver{}, xerrors.Errorf("unsupported type %s", libType)
 	}

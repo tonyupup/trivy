@@ -17,6 +17,7 @@ import (
 	aos "github.com/aquasecurity/trivy/pkg/fanal/analyzer/os"
 	"github.com/aquasecurity/trivy/pkg/fanal/log"
 	"github.com/aquasecurity/trivy/pkg/fanal/types"
+	"github.com/aquasecurity/trivy/pkg/utils"
 )
 
 var (
@@ -101,8 +102,8 @@ type AnalysisResult struct {
 	Applications         []types.Application
 	Secrets              []types.Secret
 	SystemInstalledFiles []string // A list of files installed by OS package manager
-
-	Files map[types.HandlerType][]types.File
+	CPE                  map[string][]string
+	Files                map[types.HandlerType][]types.File
 
 	// For Red Hat
 	BuildInfo *types.BuildInfo
@@ -119,7 +120,7 @@ func NewAnalysisResult() *AnalysisResult {
 }
 
 func (r *AnalysisResult) isEmpty() bool {
-	return r.OS == nil && r.Repository == nil && len(r.PackageInfos) == 0 && len(r.Applications) == 0 &&
+	return r.CPE == nil && r.OS == nil && r.Repository == nil && len(r.PackageInfos) == 0 && len(r.Applications) == 0 &&
 		len(r.Secrets) == 0 && len(r.SystemInstalledFiles) == 0 && r.BuildInfo == nil && len(r.Files) == 0 && len(r.CustomResources) == 0
 }
 
@@ -196,6 +197,8 @@ func (r *AnalysisResult) Merge(new *AnalysisResult) {
 	if len(new.Applications) > 0 {
 		r.Applications = append(r.Applications, new.Applications...)
 	}
+
+	r.CPE = utils.MergeMap(r.CPE, new.CPE)
 
 	for t, files := range new.Files {
 		if v, ok := r.Files[t]; ok {

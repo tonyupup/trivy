@@ -15,6 +15,7 @@ type Report struct {
 	ArtifactType  ftypes.ArtifactType `json:",omitempty"`
 	Metadata      Metadata            `json:",omitempty"`
 	Results       Results             `json:",omitempty"`
+	CPEs          map[string][]string `json:",omitempty"`
 }
 
 // Metadata represents a metadata of artifact
@@ -54,6 +55,7 @@ type Result struct {
 	Misconfigurations []DetectedMisconfiguration `json:"Misconfigurations,omitempty"`
 	Secrets           []ftypes.SecretFinding     `json:"Secrets,omitempty"`
 	CustomResources   []ftypes.CustomResource    `json:"CustomResources,omitempty"`
+	CPEs              map[string][]string        `json:"cpe"`
 }
 
 func (r *Result) MarshalJSON() ([]byte, error) {

@@ -8,6 +8,7 @@ const (
 	// ======
 	TypeOSRelease  Type = "os-release"
 	TypeAlpine     Type = "alpine"
+	TypeCPE        Type = "cpe"
 	TypeAmazon     Type = "amazon"
 	TypeCBLMariner Type = "cbl-mariner"
 	TypeDebian     Type = "debian"

@@ -44,7 +44,7 @@ const (
 	PropertyFilePath        = "FilePath"
 	PropertyLayerDigest     = "LayerDigest"
 	PropertyLayerDiffID     = "LayerDiffID"
-
+	PropertyCPE             = "CPE"
 	// https://json-schema.org/understanding-json-schema/reference/string.html#dates-and-times
 	timeLayout = "2006-01-02T15:04:05+00:00"
 )
@@ -154,7 +154,8 @@ func (cw *Writer) parseComponents(r types.Report, bomRef string) (*[]cdx.Compone
 		var componentDependencies []cdx.Dependency
 		bomRefMap := map[string]string{}
 		for _, pkg := range result.Packages {
-			pkgComponent, err := cw.pkgToComponent(result.Type, r.Metadata, pkg)
+
+			pkgComponent, err := cw.pkgToComponent(result.Type, r.Metadata, pkg, r.CPEs)
 			if err != nil {
 				return nil, nil, nil, xerrors.Errorf("failed to parse pkg: %w", err)
 			}
@@ -275,20 +276,27 @@ func (cw *Writer) vulnerability(vuln types.DetectedVulnerability, bomRef string)
 	return v
 }
 
-func (cw *Writer) pkgToComponent(t string, meta types.Metadata, pkg ftypes.Package) (cdx.Component, error) {
+func (cw *Writer) pkgToComponent(t string, meta types.Metadata, pkg ftypes.Package, CPEs map[string][]string) (cdx.Component, error) {
 	pu, err := purl.NewPackageURL(t, meta, pkg)
 	if err != nil {
 		return cdx.Component{}, xerrors.Errorf("failed to new package purl: %w", err)
 	}
-	properties := parseProperties(pkg)
 	component := cdx.Component{
 		Type:       cdx.ComponentTypeLibrary,
 		Name:       pkg.Name,
 		Version:    pu.Version,
 		BOMRef:     pu.BOMRef(),
 		PackageURL: pu.ToString(),
-		Properties: &properties,
 	}
+
+	//location cpes by purl
+	cpe_list, ok := CPEs[component.PackageURL]
+	if ok && len(cpe_list) > 0 {
+		component.CPE = cpe_list[0]
+	}
+
+	properties := parseProperties(pkg, cpe_list)
+	component.Properties = &properties
 
 	if pkg.License != "" {
 		component.Licenses = &cdx.Licenses{
@@ -380,7 +388,7 @@ func (cw Writer) resultToComponent(r types.Result, osFound *ftypes.OS) cdx.Compo
 	return component
 }
 
-func parseProperties(pkg ftypes.Package) []cdx.Property {
+func parseProperties(pkg ftypes.Package, cpe_list []string) []cdx.Property {
 	props := []struct {
 		name  string
 		value string
@@ -398,6 +406,13 @@ func parseProperties(pkg ftypes.Package) []cdx.Property {
 	var properties []cdx.Property
 	for _, prop := range props {
 		properties = appendProperties(properties, prop.name, prop.value)
+	}
+
+	for _, cpe := range cpe_list {
+		properties = append(properties, cdx.Property{
+			Name:  Namespace + "cpe",
+			Value: cpe,
+		})
 	}
 
 	return properties

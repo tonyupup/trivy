@@ -89,3 +89,19 @@ func GetTLSConfig(caCertPath, certPath, keyPath string) (*x509.CertPool, tls.Cer
 
 	return caCertPool, cert, nil
 }
+
+// merge mutile map to one
+func MergeMap[KT comparable, VT any](mList ...map[KT]VT) map[KT]VT {
+	var result = make(map[KT]VT)
+
+	for _, m := range mList {
+		if m == nil {
+			continue
+		}
+		for k, v := range m {
+			result[k] = v
+		}
+	}
+
+	return result
+}

@@ -8,6 +8,7 @@ import (
 	"github.com/knqyf263/nested"
 
 	"github.com/aquasecurity/trivy/pkg/fanal/types"
+	"github.com/aquasecurity/trivy/pkg/utils"
 )
 
 type Config struct {
@@ -100,6 +101,8 @@ func ApplyLayers(layers []types.BlobInfo) types.ArtifactDetail {
 		if layer.OS != nil {
 			mergedLayer.OS = layer.OS
 		}
+
+		mergedLayer.CPEs = utils.MergeMap(mergedLayer.CPEs, layer.CPEs)
 
 		if layer.Repository != nil {
 			mergedLayer.Repository = layer.Repository

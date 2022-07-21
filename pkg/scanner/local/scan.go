@@ -96,6 +96,7 @@ func (s Scanner) Scan(ctx context.Context, target, artifactKey string, blobKeys 
 	var eosl bool
 	var results types.Results
 
+	results = append(results, types.Result{CPEs: artifactDetail.CPEs})
 	// Scan OS packages and language-specific dependencies
 	if slices.Contains(options.SecurityChecks, types.SecurityCheckVulnerability) {
 		var vulnResults types.Results
@@ -129,7 +130,8 @@ func (s Scanner) Scan(ctx context.Context, target, artifactKey string, blobKeys 
 		})
 	}
 
-	for i := range results {
+	// use results[1:]: results[0] only has cpe map
+	for i := range results[1:] {
 		// Fill vulnerability details
 		s.vulnClient.FillInfo(results[i].Vulnerabilities)
 	}

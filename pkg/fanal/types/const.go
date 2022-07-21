@@ -11,6 +11,7 @@ const (
 	GemSpec    = "gemspec"
 	Cargo      = "cargo"
 	Composer   = "composer"
+	CPE        = "cpe"
 	Npm        = "npm"
 	NuGet      = "nuget"
 	Pip        = "pip"

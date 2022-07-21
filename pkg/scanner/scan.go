@@ -127,6 +127,8 @@ func (s Scanner) ScanArtifact(ctx context.Context, options types.ScanOptions) (t
 		log.Logger.Warnf("The vulnerability detection may be insufficient because security updates are not provided")
 	}
 
+	cpes := results[0].CPEs
+	results = results[1:]
 	// Layer makes sense only when scanning container images
 	if artifactInfo.Type != ftypes.ArtifactContainerImage {
 		removeLayer(results)
@@ -145,6 +147,7 @@ func (s Scanner) ScanArtifact(ctx context.Context, options types.ScanOptions) (t
 			ImageConfig: artifactInfo.ImageMetadata.ConfigFile,
 		},
 		Results: results,
+		CPEs:    cpes,
 	}, nil
 }
 
